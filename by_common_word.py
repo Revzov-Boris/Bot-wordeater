@@ -1,5 +1,6 @@
 from random import shuffle
 from colorama import Fore
+from random import choice
 
 
 def two_offer_with_same_word(name_phrases_file):
@@ -16,13 +17,16 @@ def two_offer_with_same_word(name_phrases_file):
                 break
         if not(flag): # в случае если не нашлось предложения, содержащего хоть одно слово из первого
             continue
-        k = None
-        k2 = None
-        for obsh_word in ofr2.split():
-            if obsh_word in ofr.split():
-                k = ofr.split().index(obsh_word)
-                k2 = ofr2.split().index(obsh_word)
-                break
+
+        couples_indexes = [] # пары индексов
+        for obsh_word_index1 in range(1, len(ofr.split())):
+            for obsh_word_index2 in range(len(ofr2.split())):
+                if ofr.split()[obsh_word_index1] == ofr2.split()[obsh_word_index2]:
+                    couples_indexes.append((obsh_word_index1, obsh_word_index2))
+        if len(couples_indexes) == 0:
+            continue
+
+        k, k2 = choice(couples_indexes) # индекс общего слова в ofr и индекс общего слова в ofr2
         o = ""
         o2 = ""
         for i in ofr.split()[:k+1]:
@@ -30,15 +34,17 @@ def two_offer_with_same_word(name_phrases_file):
         for i in ofr2.split()[k2+1:]:
             o2+=i+" "
         o2 = o2.strip()
-        if (o+o2 == ofr) or (o+o2 == ofr2) or (o+o2 in ofr) or (o+o2 in ofr2):
+        generated_offer = o + o2
+        if (generated_offer in ofr) or (generated_offer in ofr2):
             continue
 
-        print('"'+Fore.YELLOW+o+o2+Fore.WHITE+'"')
+        print('"' + Fore.YELLOW + generated_offer + Fore.WHITE + '"')
         print(ofr+"\n"+ofr2)
-        print(obsh_word)
+        print(ofr.split()[k])
+        print(couples_indexes)
         print(k, k2)
 
-        return o+o2
+        return generated_offer
 
 while 1:
     offer = two_offer_with_same_word("phrases.txt")
